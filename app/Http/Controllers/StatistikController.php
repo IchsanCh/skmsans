@@ -1,0 +1,170 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Units;
+use App\Models\Question;
+use Illuminate\Http\Request;
+use App\Models\SurveyResponse;
+use App\Models\ResponseAnswer;
+
+class StatistikController extends Controller
+{
+    public function test()
+    {
+        return view('testing');
+    }
+    public function index(Request $request)
+    {
+        $units = Units::all();
+
+        $unitId = $request->input('unit_id');
+        $startDate = $request->input('tanggal_awal');
+        $endDate = $request->input('tanggal_akhir');
+
+        $query = SurveyResponse::query();
+
+        if ($unitId) {
+            $query->where('unit_id', $unitId);
+        }
+
+        if ($startDate && $endDate) {
+            $query->whereBetween('created_at', [$startDate, $endDate]);
+        }
+
+        $responses = $query->with('responseAnswers.question', 'responseAnswers.questionOption')->get();
+        $totalResponden = $responses->count();
+        $unsurCount = Question::count();
+
+        $totalNRR = 0;
+        $jumlahTiapBobot = [1 => 0, 2 => 0, 3 => 0, 4 => 0];
+
+        foreach ($responses as $response) {
+            foreach ($response->responseAnswers as $answer) {
+                $bobot = $answer->questionOption->bobot ?? 0;
+                $totalNRR += $bobot;
+
+                if (isset($jumlahTiapBobot[$bobot])) {
+                    $jumlahTiapBobot[$bobot]++;
+                }
+            }
+        }
+
+        $jumlahJawaban = $unsurCount * max($totalResponden, 1);
+        $nrr = $jumlahJawaban > 0 ? $totalNRR / $jumlahJawaban : 0;
+        $nrrTertimbang = $nrr * 0.111 * $unsurCount;
+        $ikm = round($nrrTertimbang * 25, 2);
+
+        $mutu = 'Tidak Baik';
+        if ($ikm >= 88.31) $mutu = 'Sangat Baik';
+        elseif ($ikm >= 76.61) $mutu = 'Baik';
+        elseif ($ikm >= 65.00) $mutu = 'Kurang Baik';
+
+        // ✅ Persentase + jumlah
+        $totalJawaban = array_sum($jumlahTiapBobot);
+        $persentaseKepuasan = [];
+        foreach ($jumlahTiapBobot as $bobot => $jumlah) {
+            $persentaseKepuasan[$bobot] = [
+                'jumlah' => $jumlah,
+                'persen' => $totalJawaban > 0
+                    ? round(($jumlah / $totalJawaban) * 100, 2)
+                    : 0,
+            ];
+        }
+
+        $pekerjaanStat = $responses->groupBy('pekerjaan')->map(function ($items) use ($totalResponden) {
+            return [
+                'jumlah' => $items->count(),
+                'persen' => round(($items->count() / max($totalResponden, 1)) * 100, 2),
+            ];
+        });
+
+        $pendidikanStat = $responses->groupBy('pendidikan')->map(function ($items) use ($totalResponden) {
+            return [
+                'jumlah' => $items->count(),
+                'persen' => round(($items->count() / max($totalResponden, 1)) * 100, 2),
+            ];
+        });
+
+        $questions = Question::all();
+        $mutuPerPertanyaan = [];
+
+        foreach ($questions as $question) {
+            $answers = ResponseAnswer::where('question_id', $question->id)
+                ->whereHas('surveyResponse', function ($q) use ($unitId, $startDate, $endDate) {
+                    if ($unitId) {
+                        $q->where('unit_id', $unitId);
+                    }
+                    if ($startDate && $endDate) {
+                        $q->whereBetween('created_at', [$startDate, $endDate]);
+                    }
+                })
+                ->with('questionOption')
+                ->get();
+
+            $jumlahJawaban = $answers->count();
+            $totalBobot = $answers->sum(fn($a) => $a->questionOption->bobot ?? 0);
+            $nrrPertanyaan = $jumlahJawaban > 0 ? round($totalBobot / $jumlahJawaban, 2) : 0;
+            $nilaiPertanyaan = round($nrrPertanyaan * 25, 2);
+
+            $mutuLabel = 'Tidak Baik';
+            if ($nilaiPertanyaan >= 88.31) $mutuLabel = 'Sangat Baik';
+            elseif ($nilaiPertanyaan >= 76.61) $mutuLabel = 'Baik';
+            elseif ($nilaiPertanyaan >= 65.00) $mutuLabel = 'Kurang Baik';
+
+            $jumlahPerPilihan = [
+                'Sangat Baik' => 0,
+                'Baik' => 0,
+                'Kurang Baik' => 0,
+                'Tidak Baik' => 0,
+            ];
+
+            foreach ($answers as $ans) {
+                $label = $ans->questionOption->label ?? 'Tidak Diketahui';
+                if (isset($jumlahPerPilihan[$label])) {
+                    $jumlahPerPilihan[$label]++;
+                }
+            }
+
+            $mutuPerPertanyaan[] = [
+                'pertanyaan' => $question->pertanyaan,
+                'unsur_pelayanan' => $question->unsur_pelayanan,
+                'nrr' => $nrrPertanyaan,
+                'nilai' => $nilaiPertanyaan,
+                'mutu' => $mutuLabel,
+                'jumlah_pilihan' => $jumlahPerPilihan,
+            ];
+        }
+        $genderStat = $responses->groupBy('jenis_kelamin')->map(function ($items) use ($totalResponden) {
+            return [
+                'jumlah' => $items->count(),
+                'persen' => round(($items->count() / max($totalResponden, 1)) * 100, 2),
+            ];
+        });
+
+        return view('statistik', compact(
+            'units',
+            'totalResponden',
+            'ikm',
+            'mutu',
+            'persentaseKepuasan',
+            'unitId',
+            'startDate',
+            'endDate',
+            'pekerjaanStat',
+            'pendidikanStat',
+            'mutuPerPertanyaan',
+            'genderStat',
+        ));
+    }
+    public function home()
+    {
+        $query = SurveyResponse::query();
+        $units = Units::all();
+        $responses = $query->with('responseAnswers.question', 'responseAnswers.questionOption')->get();
+        $totalResponden = $responses->count();
+        $totalUnits = $units->count();
+
+        return view('welcome', compact('totalResponden', 'totalUnits'));
+    }
+}

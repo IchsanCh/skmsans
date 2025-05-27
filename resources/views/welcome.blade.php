@@ -1,8 +1,40 @@
 @extends('layouts.app')
 
 <x-navbar></x-navbar>
+@section('title', 'SKM MPP Kab Pekalongan')
 
+@section('meta_description',
+    'Selamat datang di aplikasi Survei Kepuasan Masyarakat (SKM). Mari berpartisipasi untuk
+    meningkatkan kualitas pelayanan publik.')
+
+@section('og_description',
+    'Ayo ikut Survei Kepuasan Masyarakat! Bersama kita tingkatkan kualitas layanan publik yang
+    lebih baik.')
 @section('content')
+    @if (session('success'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: '{{ session('success') }}',
+                    confirmButtonColor: '#3085d6',
+                    confirmButtonText: 'OK'
+                });
+            });
+        </script>
+    @endif
+    @if (session('error'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops!',
+                    text: '{{ session('error') }}'
+                });
+            });
+        </script>
+    @endif
     <div class="main bg-base-200 min-h-screen" data-theme="dark">
         <!-- Hero Section -->
         <div class="hero min-h-[70vh] bg-gradient-to-br from-primary/20 to-secondary/20">
@@ -23,7 +55,7 @@
                             Welcome To
                             <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary"
                                 data-aos="fade-up" data-aos-duration="800">
-                                SKM Lotusaja
+                                SKM MPP Kab Pekalongan
                             </span>
                         </h1>
 
@@ -48,8 +80,8 @@
                         </div>
 
                         <!-- Stats -->
-                        <div
-                            class="stats stats-vertical lg:stats-horizontal shadow-lg mt-8 bg-base-100/80 backdrop-blur-sm">
+                        <div class="stats stats-vertical lg:stats-horizontal shadow-lg mt-8 bg-base-100/80 backdrop-blur-sm"
+                            data-aos="fade-up" data-aos-duration="900">
                             <div class="stat">
                                 <div class="stat-figure text-primary">
                                     <i class="fas fa-users text-2xl"></i>
@@ -58,16 +90,6 @@
                                 <div class="stat-value text-primary">{{ number_format($totalResponden) }}</div>
                                 <div class="stat-desc">Sejak diluncurkan</div>
                             </div>
-                            {{-- 
-                            <div class="stat">
-                                <div class="stat-figure text-secondary">
-                                    <i class="fas fa-star text-2xl"></i>
-                                </div>
-                                <div class="stat-title"></div>
-                                <div class="stat-value text-secondary">{{ $averageRating ?? '4.3' }}</div>
-                                <div class="stat-desc">Dari 5 bintang</div>
-                            </div> --}}
-
                             <div class="stat">
                                 <div class="stat-figure text-accent">
                                     <i class="fas fa-clipboard-list text-2xl"></i>
@@ -194,7 +216,7 @@
             </div>
         </section>
         <!-- FAQ Section -->
-        <section class="py-20 bg-base-100">
+        <section id="faq" class="py-20 bg-base-100">
             <div class="container mx-auto px-6">
                 <div class="text-center mb-16">
                     <h2 class="text-4xl font-bold mb-4" data-aos="fade-up" data-aos-duration="900">Pertanyaan yang Sering
@@ -280,6 +302,7 @@
             </div>
         </section>
     </div>
+    <x-footer></x-footer>
 
     <script>
         function scrollToSection(sectionId) {

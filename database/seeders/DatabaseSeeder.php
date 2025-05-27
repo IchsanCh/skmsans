@@ -46,7 +46,7 @@ class DatabaseSeeder extends Seeder
                 ]);
             }
         });
-        // SurveyResponse::factory(100)->create()->each(function ($response) {
+        // SurveyResponse::factory(1000)->create()->each(function ($response) {
         //     // Jawab 10 pertanyaan
         //     $questions = Question::all();
         //     foreach ($questions as $question) {

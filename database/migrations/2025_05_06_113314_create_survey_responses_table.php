@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('unit_id')->constrained()->cascadeOnDelete();
             $table->foreignId('service_id')->constrained()->cascadeOnDelete();
-            $table->string('usia');
+            $table->integer('usia');
             $table->string('jenis_kelamin');
             $table->string('pendidikan');
             $table->string('pekerjaan');

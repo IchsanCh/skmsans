@@ -13,4 +13,3 @@ Route::post('/survey/questions', [SurveyController::class, 'submit'])->name('sur
 Route::get('/get-services/{unit_id}', [SurveyController::class, 'getServices']);
 
 Route::get('/statistik', [StatistikController::class, 'index'])->name('statistik.index');
-Route::get('/testing', [StatistikController::class, 'test'])->name('testing.indexs');

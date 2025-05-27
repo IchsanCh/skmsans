@@ -1,5 +1,13 @@
 @extends('layouts.app')
+@section('title', 'Isi Survei Kepuasan Masyarakat')
 
+@section('meta_description',
+    'Isi survei kepuasan masyarakat secara mudah dan cepat. Pendapat Anda sangat penting untuk
+    peningkatan layanan publik.')
+
+@section('og_description',
+    'Pendapat Anda penting! Isi survei SKM sekarang dan bantu tingkatkan pelayanan publik di
+    instansi kami.')
 @section('content')
     <div class="min-h-screen bg-gradient-to-br from-base-200 via-base-100 to-base-200">
         <!-- Progress Bar -->
@@ -139,7 +147,7 @@
                                 </div>
 
                                 <div class="form-control">
-                                    <textarea name="masukan" id="masukan"
+                                    <textarea name="masukan" id="masukan" maxlength="500"
                                         class="textarea textarea-bordered textarea-lg min-h-32 text-base resize-none focus:textarea-primary transition-all duration-300"
                                         placeholder="Tuliskan saran, kritik, atau pengalaman Anda..."></textarea>
                                     <div class="label">
@@ -398,4 +406,5 @@
             updateProgress();
         });
     </script>
+    <x-footers></x-footers>
 @endsection

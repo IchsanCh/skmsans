@@ -1,48 +1,56 @@
 @extends('layouts.app')
 {{-- @extends('components.navbar') --}}
-@section('title', 'Dashboard Kepuasan Masyarakat')
-@extends('components.navbar')
-@push('styles')
-    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-    <style>
-        .gradient-bg {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
+@section('title', 'Statistik Hasil Survei SKM')
 
-        .card-hover {
-            transition: all 0.3s ease;
-        }
+@section('meta_description',
+    'Lihat hasil dan analisis dari survei kepuasan masyarakat. Data real-time untuk evaluasi
+    pelayanan publik.')
 
-        .card-hover:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
-        }
-
-        .animate-fade-in {
-            animation: fadeIn 0.6s ease-in;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
+@section('og_description',
+    'Lihat statistik kepuasan masyarakat secara langsung. Transparan, informatif, dan berbasis
+    data.')
+    @extends('components.navbar')
+    @push('styles')
+        <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+        <style>
+            .gradient-bg {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             }
 
-            to {
-                opacity: 1;
-                transform: translateY(0);
+            .card-hover {
+                transition: all 0.3s ease;
             }
-        }
 
-        .stats-number {
-            background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-    </style>
-@endpush
+            .card-hover:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+            }
+
+            .animate-fade-in {
+                animation: fadeIn 0.6s ease-in;
+            }
+
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .stats-number {
+                background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+        </style>
+    @endpush
 
 @section('content')
     <div class="bg-base-200 min-h-screen" data-theme="dark">
@@ -75,14 +83,16 @@
                             <label class="label">
                                 <span class="label-text font-semibold">Tanggal Awal</span>
                             </label>
-                            <input type="date" name="tanggal_awal" class="input input-bordered input-primary"
+                            <input type="date" name="tanggal_awal"
+                                class="input input-bordered text-base-content input-primary"
                                 value="{{ request('tanggal_awal') }}" />
                         </div>
                         <div class="form-control">
                             <label class="label">
                                 <span class="label-text font-semibold">Tanggal Akhir</span>
                             </label>
-                            <input type="date" name="tanggal_akhir" class="input input-bordered input-primary"
+                            <input type="date" name="tanggal_akhir"
+                                class="input text-base-content input-bordered input-primary"
                                 value="{{ request('tanggal_akhir') }}" />
                         </div>
                         <div class="form-control">
@@ -104,15 +114,10 @@
                     <div class="stat-figure">
                         <i class="fas fa-users text-3xl opacity-80"></i>
                     </div>
-                    <div class="stat-title text-blue-100 text-2xl font-bold">Total Responden</div>
+                    <div class="stat-title text-blue-100 text-xl font-bold">Total Responden</div>
                     <div class="stat-value text-white">{{ number_format($totalResponden) }}</div>
-                    <div class="stat-desc text-blue-100 text-2xl font-semibold">
-                        @if (request('tanggal_awal') && request('tanggal_akhir'))
-                            {{ date('d M Y', strtotime(request('tanggal_awal'))) }} -
-                            {{ date('d M Y', strtotime(request('tanggal_akhir'))) }}
-                        @else
-                            Semua periode
-                        @endif
+                    <div class="stat-desc text-blue-100 font-semibold">
+                        {{ date('d M Y', strtotime($startDate)) }} - {{ date('d M Y', strtotime($endDate)) }}
                     </div>
                 </div>
 
@@ -120,23 +125,23 @@
                     <div class="stat-figure">
                         <i class="fas fa-star text-3xl opacity-80"></i>
                     </div>
-                    <div class="text-green-100 text-2xl font-bold">Index Kepuasan</div>
+                    <div class="text-green-100 text-xl font-bold">Index Kepuasan</div>
                     <div class="stat-value text-white">{{ $ikm }}%</div>
-                    <div class="stat-desc text-green-100 text-2xl font-semibold">{{ $mutu }}</div>
+                    <div class="stat-desc text-green-100 text-lg font-semibold">{{ $mutu }}</div>
                 </div>
                 <div class="stat bg-gradient-to-r from-purple-500 to-pink-600 text-white rounded-2xl shadow-xl card-hover">
                     <div class="stat-figure">
                         <i class="fas fa-calendar text-3xl opacity-80"></i>
                     </div>
-                    <div class="stat-title text-purple-100 text-2xl font-bold">Unit Kerja</div>
-                    <div class="stat-value text-white text-lg">
+                    <div class="stat-title text-purple-100 text-xl font-bold">Unit Kerja</div>
+                    <div class="stat-value text-white text-sm">
                         @if (request('unit_id'))
                             {{ $units->find(request('unit_id'))->nama ?? 'Unit' }}
                         @else
                             Semua Unit
                         @endif
                     </div>
-                    <div class="stat-desc text-purple-100 text-2xl font-semibold">{{ $units->count() }} Total Unit
+                    <div class="stat-desc text-purple-100 text-lg font-semibold">{{ $units->count() }} Total Unit
                         Pelayanan</div>
                 </div>
             </div>
@@ -167,22 +172,22 @@
                         </div>
                         <div class="grid grid-cols-2 gap-2 mt-4">
                             <div class="stat bg-success/10 rounded-lg">
-                                <div class="stat-title text-xs font-white">Sangat Puas</div>
+                                <div class="stat-title text-xs text-white font-semibold">Sangat Puas</div>
                                 <div class="stat-value text-lg text-success">{{ $persentaseKepuasan[4]['persen'] ?? 0 }}%
                                 </div>
                             </div>
                             <div class="stat bg-info/10 rounded-lg">
-                                <div class="stat-title text-xs">Puas</div>
+                                <div class="stat-title text-xs text-white font-semibold">Puas</div>
                                 <div class="stat-value text-lg text-info">{{ $persentaseKepuasan[3]['persen'] ?? 0 }}%
                                 </div>
                             </div>
                             <div class="stat bg-warning/10 rounded-lg">
-                                <div class="stat-title text-xs">Tidak Puas</div>
+                                <div class="stat-title text-xs text-white font-semibold">Tidak Puas</div>
                                 <div class="stat-value text-lg text-warning">{{ $persentaseKepuasan[2]['persen'] ?? 0 }}%
                                 </div>
                             </div>
                             <div class="stat bg-error/10 rounded-lg">
-                                <div class="stat-title text-xs">Kecewa</div>
+                                <div class="stat-title text-xs text-white font-semibold">Kecewa</div>
                                 <div class="stat-value text-lg text-error">{{ $persentaseKepuasan[1]['persen'] ?? 0 }}%
                                 </div>
                             </div>
@@ -217,7 +222,7 @@
                             <div class="grid grid-cols-2 gap-2 mt-4">
                                 @foreach ($pendidikanStat as $pendidikan => $stat)
                                     <div class="stat bg-info/10 rounded-lg">
-                                        <div class="stat-title text-xs">{{ $pendidikan }}</div>
+                                        <div class="stat-title text-xs text-white font-semibold">{{ $pendidikan }}</div>
                                         <div class="stat-value text-lg text-info">{{ $stat['persen'] }}%</div>
                                     </div>
                                 @endforeach
@@ -238,9 +243,9 @@
                         </div>
                         <div class="grid grid-cols-2 gap-2 mt-4">
                             @foreach ($pekerjaanStat as $pekerjaan => $stat)
-                                <div class="stat bg-info/10 rounded-lg">
-                                    <div class="stat-title text-xs">{{ $pekerjaan }}</div>
-                                    <div class="stat-value text-lg text-info">{{ $stat['persen'] }}%</div>
+                                <div class="stat bg-warning/10 rounded-lg">
+                                    <div class="stat-title text-xs font-semibold text-white">{{ $pekerjaan }}</div>
+                                    <div class="stat-value text-lg text-warning">{{ $stat['persen'] }}%</div>
                                 </div>
                             @endforeach
                         </div>
@@ -263,13 +268,30 @@
                                         'P' => 'Perempuan',
                                     };
                                 @endphp
-                                <div class="stat bg-info/10 rounded-lg">
-                                    <div class="stat-title text-xs">{{ $genders }}</div>
-                                    <div class="stat-value text-lg text-info">{{ $stat['persen'] }}%</div>
+                                <div class="stat bg-success/10 rounded-lg">
+                                    <div class="stat-title text-xs font-semibold text-white">{{ $genders }}</div>
+                                    <div class="stat-value text-lg text-success">{{ $stat['persen'] }}%</div>
                                 </div>
                             @endforeach
                         </div>
                     </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <h2 class="card-title text-2xl mb-4">
+                    <i class="fas fa-briefcase text-primary mr-2"></i>
+                    Responden Berdasarkan Usia
+                </h2>
+                <div class="w-full h-80">
+                    <canvas id="usiaChart"></canvas>
+                </div>
+                <div class="grid grid-cols-2 gap-2 mt-4">
+                    @foreach ($usiaStat as $usia => $stat)
+                        <div class="stat bg-info/10 rounded-lg">
+                            <div class="stat-title text-xs font-semibold text-white">{{ $usia }}</div>
+                            <div class="stat-value text-lg text-info">{{ $stat['persen'] }}%</div>
+                        </div>
+                    @endforeach
                 </div>
             </div>
 
@@ -288,7 +310,7 @@
                             <thead>
                                 <tr class="bg-primary text-primary-content">
                                     <th rowspan="2">No</th>
-                                    <th rowspan="2">Pertanyaan</th>
+                                    <th rowspan="2" class="text-center">Unsur Pelayanan</th>
                                     <th colspan="4" class="text-center">Jumlah Responden yang Menjawab (orang)</th>
                                     <th rowspan="2">Nilai Rata2</th>
                                     <th rowspan="2">Mutu</th>
@@ -347,20 +369,7 @@
         </div>
 
         <!-- Footer -->
-        <footer class="footer footer-center p-10 bg-base-200 text-base-content rounded mt-16">
-            <div>
-                <div class="grid grid-flow-col gap-4">
-                    <i class="fab fa-twitter text-2xl cursor-pointer hover:text-primary"></i>
-                    <i class="fab fa-youtube text-2xl cursor-pointer hover:text-primary"></i>
-                    <i class="fab fa-facebook text-2xl cursor-pointer hover:text-primary"></i>
-                </div>
-                <p class="font-bold">
-                    Dashboard Kepuasan Masyarakat
-                    <br />Memberikan pelayanan terbaik untuk masyarakat
-                </p>
-                <p>Copyright © {{ date('Y') }} - All rights reserved</p>
-            </div>
-        </footer>
+        <x-footer></x-footer>
     </div>
     <script>
         // Data from Laravel Controller
@@ -423,6 +432,15 @@
                         color: '{{ ['#8b5cf6', '#06b6d4'][$loop->index % 2] }}'
                     },
                 @endforeach
+            ],
+            usiaStats: [
+                @foreach ($usiaStat as $usia => $stat)
+                    {
+                        label: '{{ $usia }}',
+                        value: {{ $stat['jumlah'] }},
+                        color: '{{ ['#8b5cf6', '#06b6d4', '#10b981', '#f59e0b', '#ef4444'][$loop->index % 5] }}'
+                    },
+                @endforeach
             ]
         };
 
@@ -445,6 +463,9 @@
             }
             if (surveyData.questionQuality.length > 0) {
                 createBarChart('barSoal', surveyData.questionQuality);
+            }
+            if (surveyData.usiaStats.length > 0 && surveyData.usiaStats.some(item => item.value > 0)) {
+                createPieChart('usiaChart', surveyData.usiaStats, 'Usia Responden');
             }
         }
 

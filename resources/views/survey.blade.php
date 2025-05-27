@@ -1,5 +1,13 @@
 @extends('layouts.app')
+@section('title', 'Isi Survei Kepuasan Masyarakat')
 
+@section('meta_description',
+    'Isi survei kepuasan masyarakat secara mudah dan cepat. Pendapat Anda sangat penting untuk
+    peningkatan layanan publik.')
+
+@section('og_description',
+    'Pendapat Anda penting! Isi survei SKM sekarang dan bantu tingkatkan pelayanan publik di
+    instansi kami.')
 @section('content')
     <div class="min-h-screen bg-base-300 py-8">
         @if (session('success'))
@@ -75,52 +83,20 @@
                             <div class="divider"></div>
 
                             <!-- Age Selection -->
-                            <div class="form-control">
+                            <div class="form-control max-w-md flex flex-col">
                                 <label class="label">
                                     <span class="label-text text-lg font-semibold">Usia</span>
                                 </label>
-                                <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mt-4">
-                                    <div class="form-control">
-                                        <label
-                                            class="label cursor-pointer flex-col gap-3 p-4 rounded-lg border border-base-300 hover:border-primary hover:bg-primary/5 transition-all">
-                                            <input type="radio" name="usia" value="<17"
-                                                class="radio radio-primary" />
-                                            <span class="label-text text-center">Dibawah 17 Tahun</span>
-                                        </label>
-                                    </div>
-                                    <div class="form-control">
-                                        <label
-                                            class="label cursor-pointer flex-col gap-3 p-4 rounded-lg border border-base-300 hover:border-primary hover:bg-primary/5 transition-all">
-                                            <input type="radio" name="usia" value="17-30"
-                                                class="radio radio-primary" />
-                                            <span class="label-text text-center">17-30 Tahun</span>
-                                        </label>
-                                    </div>
-                                    <div class="form-control">
-                                        <label
-                                            class="label cursor-pointer flex-col gap-3 p-4 rounded-lg border border-base-300 hover:border-primary hover:bg-primary/5 transition-all">
-                                            <input type="radio" name="usia" value="31-40"
-                                                class="radio radio-primary" />
-                                            <span class="label-text text-center">31-40 Tahun</span>
-                                        </label>
-                                    </div>
-                                    <div class="form-control">
-                                        <label
-                                            class="label cursor-pointer flex-col gap-3 p-4 rounded-lg border border-base-300 hover:border-primary hover:bg-primary/5 transition-all">
-                                            <input type="radio" name="usia" value="41-50"
-                                                class="radio radio-primary" />
-                                            <span class="label-text text-center">41-50 Tahun</span>
-                                        </label>
-                                    </div>
-                                    <div class="form-control">
-                                        <label
-                                            class="label cursor-pointer flex-col gap-3 p-4 rounded-lg border border-base-300 hover:border-primary hover:bg-primary/5 transition-all">
-                                            <input type="radio" name="usia" value=">50"
-                                                class="radio radio-primary" />
-                                            <span class="label-text text-center">Diatas 50 Tahun</span>
-                                        </label>
-                                    </div>
-                                </div>
+                                <select name="usia"
+                                    class="select select-bordered w-full max-w-xs select-primary focus:select-primary">
+                                    <option disabled selected>Pilih usia Anda</option>
+                                    <script>
+                                        // Generate options from 13 to 99
+                                        for (let age = 13; age <= 99; age++) {
+                                            document.write(`<option value="${age}">${age} Tahun</option>`);
+                                        }
+                                    </script>
+                                </select>
                             </div>
 
                             <div class="divider"></div>
@@ -271,7 +247,15 @@
                             <div class="divider"></div>
 
                             <!-- Action Buttons -->
-                            <div class="card-actions justify-end pt-4">
+                            <div class="card-actions flex justify-between gap-4 pt-4">
+                                <a href="{{ route('home') }}" class="btn btn-secondary btn-lg">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                    Back
+                                </a>
                                 <button class="btn btn-primary btn-lg" type="submit">
                                     Lanjutkan
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" fill="none"
@@ -324,4 +308,5 @@
             });
         });
     </script>
+    <x-footers></x-footers>
 @endsection

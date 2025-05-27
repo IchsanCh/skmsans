@@ -4,7 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Survey SKM</title>
+    <title>@yield('title', 'Survey SKM')</title>
+    <meta name="description" content="@yield('meta_description', 'Survey SKM adalah aplikasi untuk mengelola survey kepuasan pelayanan publik')">
+    <meta property="og:description" content="@yield('og_description', 'Ayo ikut berpartisipasi dalam Survei Kepuasan Masyarakat!')">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">

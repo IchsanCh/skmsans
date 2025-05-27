@@ -21,10 +21,10 @@ class SurveyResponseFactory extends Factory
         return [
             'unit_id' => Units::inRandomOrder()->first()?->id ?? Units::factory(),
             'service_id' => Service::inRandomOrder()->first()?->id ?? Service::factory(),
-            'usia' => $this->faker->numberBetween(17, 65),
-            'jenis_kelamin' => $this->faker->randomElement(['Laki-laki', 'Perempuan']),
-            'pendidikan' => $this->faker->randomElement(['SD', 'SMP', 'SMA', 'S1', 'S2']),
-            'pekerjaan' => $this->faker->jobTitle(),
+            'usia' => $this->faker->numberBetween(13, 99),
+            'jenis_kelamin' => $this->faker->randomElement(['L', 'P']),
+            'pendidikan' => $this->faker->randomElement(['SD Kebawah', 'SMP', 'SMA/K', 'D1 - D4', 'S1', 'S2 Keatas']),
+            'pekerjaan' => $this->faker->randomElement(['TNI', 'Polri', 'PNS', 'Pegawai Swasta', 'Wirausaha', 'lainnya']),
             'masukan' => $this->faker->optional()->sentence(),
         ];
     }

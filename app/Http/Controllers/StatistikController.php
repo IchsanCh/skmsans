@@ -10,28 +10,21 @@ use App\Models\ResponseAnswer;
 
 class StatistikController extends Controller
 {
-    public function test()
-    {
-        return view('testing');
-    }
     public function index(Request $request)
     {
         $units = Units::all();
 
         $unitId = $request->input('unit_id');
-        $startDate = $request->input('tanggal_awal');
-        $endDate = $request->input('tanggal_akhir');
+        $tahun = now()->year;
+        $startDate = $request->input('tanggal_awal') ?? "$tahun-01-01";
+        $endDate = $request->input('tanggal_akhir') ?? "$tahun-12-31";
 
         $query = SurveyResponse::query();
 
         if ($unitId) {
             $query->where('unit_id', $unitId);
         }
-
-        if ($startDate && $endDate) {
-            $query->whereBetween('created_at', [$startDate, $endDate]);
-        }
-
+        $query->whereBetween('created_at', [$startDate, $endDate]);
         $responses = $query->with('responseAnswers.question', 'responseAnswers.questionOption')->get();
         $totalResponden = $responses->count();
         $unsurCount = Question::count();
@@ -60,7 +53,6 @@ class StatistikController extends Controller
         elseif ($ikm >= 76.61) $mutu = 'Baik';
         elseif ($ikm >= 65.00) $mutu = 'Kurang Baik';
 
-        // ✅ Persentase + jumlah
         $totalJawaban = array_sum($jumlahTiapBobot);
         $persentaseKepuasan = [];
         foreach ($jumlahTiapBobot as $bobot => $jumlah) {
@@ -141,7 +133,36 @@ class StatistikController extends Controller
                 'persen' => round(($items->count() / max($totalResponden, 1)) * 100, 2),
             ];
         });
+        $usiaStat = [
+            'Di bawah 17 tahun' => 0,
+            '17 - 30 tahun' => 0,
+            '31 - 40 tahun' => 0,
+            '41 - 50 tahun' => 0,
+            'Di atas 50 tahun' => 0,
+        ];
 
+        foreach ($responses as $response) {
+            $usia = $response->usia;
+            if ($usia < 17) {
+                $usiaStat['Di bawah 17 tahun']++;
+            } elseif ($usia >= 17 && $usia <= 30) {
+                $usiaStat['17 - 30 tahun']++;
+            } elseif ($usia >= 31 && $usia <= 40) {
+                $usiaStat['31 - 40 tahun']++;
+            } elseif ($usia >= 41 && $usia <= 50) {
+                $usiaStat['41 - 50 tahun']++;
+            } else {
+                $usiaStat['Di atas 50 tahun']++;
+            }
+        }
+
+        // Hitung persentase per kategori usia
+        $usiaStat = collect($usiaStat)->map(function ($jumlah) use ($totalResponden) {
+            return [
+                'jumlah' => $jumlah,
+                'persen' => $totalResponden > 0 ? round(($jumlah / $totalResponden) * 100, 2) : 0,
+            ];
+        });
         return view('statistik', compact(
             'units',
             'totalResponden',
@@ -155,13 +176,14 @@ class StatistikController extends Controller
             'pendidikanStat',
             'mutuPerPertanyaan',
             'genderStat',
+            'usiaStat',
         ));
     }
     public function home()
     {
         $query = SurveyResponse::query();
         $units = Units::all();
-        $responses = $query->with('responseAnswers.question', 'responseAnswers.questionOption')->get();
+        $responses = $query;
         $totalResponden = $responses->count();
         $totalUnits = $units->count();
 

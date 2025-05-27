@@ -149,7 +149,7 @@ class SurveyController extends Controller
             // Hapus session
             session()->forget('survey_data');
 
-            return redirect()->route('survey.index')->with('success', 'Terima kasih sudah mengisi survei!');
+            return redirect()->route('home')->with('success', 'Terima kasih sudah mengisi survei!');
         } catch (\Exception $e) {
             // Log error for debugging
             Log::error('Survey submission error: ' . $e->getMessage());

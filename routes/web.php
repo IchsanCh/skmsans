@@ -13,3 +13,4 @@ Route::post('/survey/questions', [SurveyController::class, 'submit'])->name('sur
 Route::get('/get-services/{unit_id}', [SurveyController::class, 'getServices']);
 
 Route::get('/statistik', [StatistikController::class, 'index'])->name('statistik.index');
+Route::get('/export-survei', [App\Http\Controllers\StatistikController::class, 'export'])->name('survei.export');

@@ -65,11 +65,13 @@
                     </h2>
                     <form method="GET" action="{{ route('statistik.index') }}"
                         class="grid grid-cols-1 md:grid-cols-4 gap-4">
+
+                        {{-- UNIT --}}
                         <div class="form-control">
                             <label class="label">
                                 <span class="label-text font-semibold">Unit Kerja</span>
                             </label>
-                            <select name="unit_id" class="select select-bordered select-primary w-full">
+                            <select name="unit_id" id="unitSelect" class="select select-bordered select-primary w-full">
                                 <option value="">Semua Unit</option>
                                 @foreach ($units as $unit)
                                     <option value="{{ $unit->id }}"
@@ -79,27 +81,51 @@
                                 @endforeach
                             </select>
                         </div>
+
+                        {{-- LAYANAN --}}
+                        <div class="form-control">
+                            <label class="label">
+                                <span class="label-text font-semibold">Pilih Layanan</span>
+                            </label>
+                            <select name="service_id" id="serviceSelect"
+                                class="select select-primary select-bordered w-full">
+                                <option value="">Semua Layanan</option>
+                                @if (request('unit_id') && request('service_id'))
+                                    @php
+                                        $selectedService = \App\Models\Service::find(request('service_id'));
+                                    @endphp
+                                    @if ($selectedService)
+                                        <option value="{{ $selectedService->id }}" selected>{{ $selectedService->nama }}
+                                        </option>
+                                    @endif
+                                @endif
+                            </select>
+                        </div>
+
+                        {{-- TANGGAL AWAL --}}
                         <div class="form-control">
                             <label class="label">
                                 <span class="label-text font-semibold">Tanggal Awal</span>
                             </label>
-                            <input type="date" name="tanggal_awal"
-                                class="input input-bordered text-base-content input-primary"
+                            <input type="date" name="tanggal_awal" class="input input-bordered input-primary"
                                 value="{{ request('tanggal_awal') }}" />
                         </div>
+
+                        {{-- TANGGAL AKHIR --}}
                         <div class="form-control">
                             <label class="label">
                                 <span class="label-text font-semibold">Tanggal Akhir</span>
                             </label>
-                            <input type="date" name="tanggal_akhir"
-                                class="input text-base-content input-bordered input-primary"
+                            <input type="date" name="tanggal_akhir" class="input input-bordered input-primary"
                                 value="{{ request('tanggal_akhir') }}" />
                         </div>
-                        <div class="form-control">
+
+                        {{-- BUTTON --}}
+                        <div class="form-control md:col-span-4">
                             <label class="label">
                                 <span class="label-text">&nbsp;</span>
                             </label>
-                            <button type="submit" class="btn btn-primary btn-block">
+                            <button type="submit" class="btn btn-primary w-full">
                                 <i class="fas fa-search mr-2"></i>
                                 Filter Data
                             </button>
@@ -107,6 +133,47 @@
                     </form>
                 </div>
             </div>
+
+            {{-- SCRIPT --}}
+            <script>
+                const unitSelect = document.getElementById('unitSelect');
+                const serviceSelect = document.getElementById('serviceSelect');
+
+                function loadServices(unitId, selectedServiceId = null) {
+                    if (!unitId) {
+                        serviceSelect.innerHTML = '<option value="">Semua Layanan</option>';
+                        return;
+                    }
+
+                    fetch(`/get-services/${unitId}`)
+                        .then(res => res.json())
+                        .then(data => {
+                            serviceSelect.innerHTML = '<option value="">Semua Layanan</option>';
+                            data.forEach(service => {
+                                const option = document.createElement('option');
+                                option.value = service.id;
+                                option.textContent = service.nama;
+                                if (selectedServiceId && service.id == selectedServiceId) {
+                                    option.selected = true;
+                                }
+                                serviceSelect.appendChild(option);
+                            });
+                        });
+                }
+
+                // Auto-load saat halaman di-reload jika ada unit_id & service_id
+                const initialUnitId = unitSelect.value;
+                const initialServiceId = '{{ request('service_id') }}';
+                if (initialUnitId) {
+                    loadServices(initialUnitId, initialServiceId);
+                }
+
+                unitSelect.addEventListener('change', function() {
+                    const selectedUnitId = this.value;
+                    loadServices(selectedUnitId);
+                });
+            </script>
+
 
             <!-- Stats Overview -->
             <div class="flex flex-col lg:flex-row justify-around gap-4">
@@ -133,7 +200,10 @@
                     <div class="stat-figure">
                         <i class="fas fa-calendar text-3xl opacity-80"></i>
                     </div>
+
                     <div class="stat-title text-purple-100 text-xl font-bold">Unit Kerja</div>
+
+                    {{-- Nama Unit --}}
                     <div class="stat-value text-white text-sm">
                         @if (request('unit_id'))
                             {{ $units->find(request('unit_id'))->nama ?? 'Unit' }}
@@ -141,8 +211,19 @@
                             Semua Unit
                         @endif
                     </div>
-                    <div class="stat-desc text-purple-100 text-lg font-semibold">{{ $units->count() }} Total Unit
-                        Pelayanan</div>
+
+                    {{-- Nama Layanan --}}
+                    <div class="text-white text-sm">
+                        @if (request('service_id'))
+                            {{ $services->find(request('service_id'))->nama ?? 'Layanan' }}
+                        @else
+                            Semua Layanan
+                        @endif
+                    </div>
+
+                    <div class="stat-desc text-purple-100 text-lg font-semibold">
+                        {{ $units->count() }} Total Unit Pelayanan
+                    </div>
                 </div>
             </div>
 

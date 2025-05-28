@@ -55,35 +55,83 @@
             </div>
         </div>
 
-        <div class="mt-4">
+        <div style="margin-top: 1rem" class="flex items-center gap-2">
             <x-filament::button type="submit">Terapkan Filter</x-filament::button>
+            <x-filament::button tag="a" href="{{ route('survei.export', request()->query()) }}" color="success">
+                Export Excel
+            </x-filament::button>
         </div>
     </form>
 
-    <table class="w-full table-auto mt-6 border">
-        <thead>
-            <tr class="">
-                <th class="border px-4 py-2">Tanggal</th>
+    <table class="w-full table-auto mt-6 border text-sm">
+        <thead class="bg-gray-100">
+            <tr>
+                <th class="border px-4 py-2">Response ID</th>
                 <th class="border px-4 py-2">Unit</th>
                 <th class="border px-4 py-2">Layanan</th>
-                <th class="border px-4 py-2">Jenis Kelamin</th>
                 <th class="border px-4 py-2">Usia</th>
+                <th class="border px-4 py-2">Jenis Kelamin</th>
+                <th class="border px-4 py-2">Pendidikan</th>
+                <th class="border px-4 py-2">Pekerjaan</th>
+                <th class="border px-4 py-2">Masukan</th>
+                <th class="border px-4 py-2">U1</th>
+                <th class="border px-4 py-2">U2</th>
+                <th class="border px-4 py-2">U3</th>
+                <th class="border px-4 py-2">U4</th>
+                <th class="border px-4 py-2">U5</th>
+                <th class="border px-4 py-2">U6</th>
+                <th class="border px-4 py-2">U7</th>
+                <th class="border px-4 py-2">U8</th>
+                <th class="border px-4 py-2">U9</th>
             </tr>
         </thead>
         <tbody>
             @forelse ($data as $item)
                 <tr>
-                    <td class="border px-4 py-2">{{ $item->created_at->format('d-m-Y') }}</td>
-                    <td class="border px-4 py-2">{{ $item->unit->nama }}</td>
-                    <td class="border px-4 py-2">{{ $item->service->nama }}</td>
-                    <td class="border px-4 py-2">{{ $item->jenis_kelamin }}</td>
+                    <td class="border px-4 py-2">{{ $item->id }}</td>
+                    <td class="border px-4 py-2">{{ $item->unit->nama ?? '-' }}</td>
+                    <td class="border px-4 py-2">{{ $item->service->nama ?? '-' }}</td>
                     <td class="border px-4 py-2">{{ $item->usia }}</td>
+                    <td class="border px-4 py-2">{{ $item->jenis_kelamin }}</td>
+                    <td class="border px-4 py-2">{{ $item->pendidikan }}</td>
+                    <td class="border px-4 py-2">{{ $item->pekerjaan }}</td>
+                    <td class="border px-4 py-2">
+                        {{ \Illuminate\Support\Str::limit(strip_tags($item->masukan), 100, '...') }}
+                    </td>
+                    <td class="border px-4 py-2">
+                        {{ optional($item->responseAnswers->firstWhere('question_id', 1)?->questionOption)->bobot ?? '-' }}
+                    </td>
+                    <td class="border px-4 py-2">
+                        {{ optional($item->responseAnswers->firstWhere('question_id', 2)?->questionOption)->bobot ?? '-' }}
+                    </td>
+                    <td class="border px-4 py-2">
+                        {{ optional($item->responseAnswers->firstWhere('question_id', 3)?->questionOption)->bobot ?? '-' }}
+                    </td>
+                    <td class="border px-4 py-2">
+                        {{ optional($item->responseAnswers->firstWhere('question_id', 4)?->questionOption)->bobot ?? '-' }}
+                    </td>
+                    <td class="border px-4 py-2">
+                        {{ optional($item->responseAnswers->firstWhere('question_id', 5)?->questionOption)->bobot ?? '-' }}
+                    </td>
+                    <td class="border px-4 py-2">
+                        {{ optional($item->responseAnswers->firstWhere('question_id', 6)?->questionOption)->bobot ?? '-' }}
+                    </td>
+                    <td class="border px-4 py-2">
+                        {{ optional($item->responseAnswers->firstWhere('question_id', 7)?->questionOption)->bobot ?? '-' }}
+                    </td>
+                    <td class="border px-4 py-2">
+                        {{ optional($item->responseAnswers->firstWhere('question_id', 8)?->questionOption)->bobot ?? '-' }}
+                    </td>
+                    <td class="border px-4 py-2">
+                        {{ optional($item->responseAnswers->firstWhere('question_id', 9)?->questionOption)->bobot ?? '-' }}
+                    </td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="5" class="text-center py-4">Data tidak ditemukan.</td>
+                    <td colspan="9" class="text-center py-4">Data tidak ditemukan.</td>
                 </tr>
             @endforelse
         </tbody>
     </table>
+
 </x-filament::page>

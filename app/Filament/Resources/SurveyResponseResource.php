@@ -17,6 +17,8 @@ use Filament\Forms\Components\TextInput;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\SurveyResponseResource\Pages;
+use AlperenErsoy\FilamentExport\Actions\FilamentExportBulkAction;
+use AlperenErsoy\FilamentExport\Actions\FilamentExportHeaderAction;
 use App\Filament\Resources\SurveyResponseResource\RelationManagers;
 use App\Filament\Resources\SurveyResponseResource\Pages\SurveyReport;
 
@@ -113,7 +115,7 @@ class SurveyResponseResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('unit.nama')
-                    ->label('Departement')
+                    ->label('Unit')
                     ->searchable()->toggleable()->sortable(),
                 TextColumn::make('service.nama')
                     ->label('Layanan')->searchable()->toggleable()->sortable(),
@@ -130,7 +132,13 @@ class SurveyResponseResource extends Resource
                     ->limit(50, '...')
                     ->tooltip(function ($state) {
                         return Str::limit(strip_tags($state), 100, '...');
-                    })
+                    }),
+            ])
+            ->headerActions([
+                Tables\Actions\Action::make('Export Report')
+                    ->icon('heroicon-o-chart-bar')
+                    ->url(fn() => SurveyResponseResource::getUrl('report'))
+                    ->color('success')
             ])
             ->filters([
                 //
@@ -159,7 +167,7 @@ class SurveyResponseResource extends Resource
             'index' => Pages\ListSurveyResponses::route('/'),
             'create' => Pages\CreateSurveyResponse::route('/create'),
             'edit' => Pages\EditSurveyResponse::route('/{record}/edit'),
-            'report' => SurveyReport::route('/report')
+            'report' => SurveyReport::route('/report'),
         ];
     }
 }

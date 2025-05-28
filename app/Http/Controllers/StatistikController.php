@@ -3,26 +3,34 @@
 namespace App\Http\Controllers;
 
 use App\Models\Units;
+use App\Models\Service;
 use App\Models\Question;
 use Illuminate\Http\Request;
-use App\Models\SurveyResponse;
 use App\Models\ResponseAnswer;
+use App\Models\SurveyResponse;
+use Illuminate\Support\Carbon;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\SurveyResponseExport;
 
 class StatistikController extends Controller
 {
     public function index(Request $request)
     {
         $units = Units::all();
-
+        $services = Service::all();
         $unitId = $request->input('unit_id');
+        $serviceId = $request->input('service_id');
         $tahun = now()->year;
-        $startDate = $request->input('tanggal_awal') ?? "$tahun-01-01";
-        $endDate = $request->input('tanggal_akhir') ?? "$tahun-12-31";
+        $startDate = Carbon::parse($request->input('tanggal_awal') ?? "$tahun-01-01")->startOfDay();
+        $endDate = Carbon::parse($request->input('tanggal_akhir') ?? "$tahun-12-31")->endOfDay();
 
         $query = SurveyResponse::query();
 
         if ($unitId) {
             $query->where('unit_id', $unitId);
+        }
+        if ($serviceId) {
+            $query->where('service_id', $serviceId);
         }
         $query->whereBetween('created_at', [$startDate, $endDate]);
         $responses = $query->with('responseAnswers.question', 'responseAnswers.questionOption')->get();
@@ -83,9 +91,12 @@ class StatistikController extends Controller
 
         foreach ($questions as $question) {
             $answers = ResponseAnswer::where('question_id', $question->id)
-                ->whereHas('surveyResponse', function ($q) use ($unitId, $startDate, $endDate) {
+                ->whereHas('surveyResponse', function ($q) use ($unitId, $serviceId, $startDate, $endDate) {
                     if ($unitId) {
                         $q->where('unit_id', $unitId);
+                    }
+                    if ($serviceId) {
+                        $q->where('service_id', $serviceId);
                     }
                     if ($startDate && $endDate) {
                         $q->whereBetween('created_at', [$startDate, $endDate]);
@@ -165,6 +176,7 @@ class StatistikController extends Controller
         });
         return view('statistik', compact(
             'units',
+            'services',
             'totalResponden',
             'ikm',
             'mutu',
@@ -188,5 +200,9 @@ class StatistikController extends Controller
         $totalUnits = $units->count();
 
         return view('welcome', compact('totalResponden', 'totalUnits'));
+    }
+    public function export(Request $request)
+    {
+        return Excel::download(new SurveyResponseExport($request), 'laporan-survei.xlsx');
     }
 }

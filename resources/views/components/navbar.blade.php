@@ -46,7 +46,7 @@
         <aside class="min-h-full w-64 color1 text-white">
             <!-- Sidebar Header -->
             <div class="p-4 border-b border-base-300">
-                <h2 class="text-lg font-bold">SKM Lotusaja</h2>
+                <h2 class="text-lg font-bold">E-SKM 1.0</h2>
             </div>
 
             <!-- Sidebar Menu -->

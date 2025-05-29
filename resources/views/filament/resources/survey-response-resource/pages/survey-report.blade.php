@@ -6,13 +6,13 @@
             <!-- Rentang Tanggal -->
             <div>
                 <label for="from_date" class="block text-sm font-medium">Dari Tanggal</label>
-                <input type="date" name="from_date" id="from_date" value="{{ request('from_date') }}"
-                    class="w-full rounded-md">
+                <input type="date" name="from_date" id="from_date"
+                    value="{{ request('from_date') ?? now()->startOfYear()->toDateString() }}" class="w-full rounded-md">
             </div>
             <div>
                 <label for="to_date" class="block text-sm font-medium">Sampai Tanggal</label>
-                <input type="date" name="to_date" id="to_date" value="{{ request('to_date') }}"
-                    class="w-full rounded-md">
+                <input type="date" name="to_date" id="to_date"
+                    value="{{ request('to_date') ?? now()->endOfYear()->toDateString() }}" class="w-full rounded-md">
             </div>
 
             <!-- Filter Unit -->
@@ -66,6 +66,7 @@
     <table class="w-full table-auto mt-6 border text-sm">
         <thead class="bg-gray-100">
             <tr>
+                <th class="border px-4 py-2">Tanggal</th>
                 <th class="border px-4 py-2">Response ID</th>
                 <th class="border px-4 py-2">Unit</th>
                 <th class="border px-4 py-2">Layanan</th>
@@ -88,6 +89,7 @@
         <tbody>
             @forelse ($data as $item)
                 <tr>
+                    <td class="border px-4 py-2">{{ $item->created_at->format('d-m-Y') }}</td>
                     <td class="border px-4 py-2">{{ $item->id }}</td>
                     <td class="border px-4 py-2">{{ $item->unit->nama ?? '-' }}</td>
                     <td class="border px-4 py-2">{{ $item->service->nama ?? '-' }}</td>

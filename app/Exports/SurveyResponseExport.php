@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\SurveyResponse;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\FromCollection;
+use Carbon\Carbon;
 
 class SurveyResponseExport implements FromCollection, WithHeadings
 {
@@ -18,14 +19,15 @@ class SurveyResponseExport implements FromCollection, WithHeadings
 
     public function collection()
     {
+        // Gunakan tahun berjalan sebagai default jika filter tidak diisi
+        $fromDate = $this->request->from_date ?? Carbon::now()->startOfYear()->format('Y-m-d');
+        $toDate = $this->request->to_date ?? Carbon::now()->endOfYear()->format('Y-m-d');
+
         $query = SurveyResponse::query()->with(['unit', 'service', 'responseAnswers.questionOption']);
 
-        if ($this->request->from_date) {
-            $query->whereDate('created_at', '>=', $this->request->from_date);
-        }
-        if ($this->request->to_date) {
-            $query->whereDate('created_at', '<=', $this->request->to_date);
-        }
+        $query->whereDate('created_at', '>=', $fromDate)
+            ->whereDate('created_at', '<=', $toDate);
+
         if ($this->request->unit_id) {
             $query->where('unit_id', $this->request->unit_id);
         }
@@ -42,6 +44,7 @@ class SurveyResponseExport implements FromCollection, WithHeadings
 
         return $query->get()->map(function ($item) {
             return [
+                'Tanggal' => $item->created_at->format('Y-m-d H:i:s'),
                 'Response ID' => $item->id,
                 'Unit' => $item->unit->nama ?? '-',
                 'Layanan' => $item->service->nama ?? '-',
@@ -66,6 +69,7 @@ class SurveyResponseExport implements FromCollection, WithHeadings
     public function headings(): array
     {
         return [
+            'Tanggal',
             'Response ID',
             'Unit',
             'Layanan',

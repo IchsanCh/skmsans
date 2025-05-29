@@ -20,12 +20,17 @@ class SurveyReport extends Page
 
     public function mount(): void
     {
+        $currentYear = now()->year;
+
+        $fromDate = request('from_date') ?? now()->setDate($currentYear, 1, 1)->toDateString();
+        $toDate = request('to_date') ?? now()->setDate($currentYear, 12, 31)->toDateString();
+
         $query = SurveyResponse::query()
             ->with(['unit', 'service'])
-            ->when(request('from_date'), fn($q) =>
-            $q->whereDate('created_at', '>=', request('from_date')))
-            ->when(request('to_date'), fn($q) =>
-            $q->whereDate('created_at', '<=', request('to_date')))
+            ->when($fromDate, fn($q) =>
+            $q->whereDate('created_at', '>=', $fromDate))
+            ->when($toDate, fn($q) =>
+            $q->whereDate('created_at', '<=', $toDate))
             ->when(request('unit_id'), fn($q) =>
             $q->where('unit_id', request('unit_id')))
             ->when(request('service_id'), fn($q) =>

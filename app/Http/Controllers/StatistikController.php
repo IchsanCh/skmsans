@@ -53,8 +53,8 @@ class StatistikController extends Controller
 
         $jumlahJawaban = $unsurCount * max($totalResponden, 1);
         $nrr = $jumlahJawaban > 0 ? $totalNRR / $jumlahJawaban : 0;
-        $nrrTertimbang = $nrr * 0.111 * $unsurCount;
-        $ikm = round($nrrTertimbang * 25, 2);
+        $nrrTertimbang = $nrr;
+        $ikm = round($nrr * 25, 2);
 
         $mutu = 'Tidak Baik';
         if ($ikm >= 88.31) $mutu = 'Sangat Baik';

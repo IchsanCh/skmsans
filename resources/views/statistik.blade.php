@@ -193,7 +193,7 @@
                         <i class="fas fa-star text-3xl opacity-80"></i>
                     </div>
                     <div class="text-green-100 text-xl font-bold">Index Kepuasan</div>
-                    <div class="stat-value text-white">{{ $ikm }}%</div>
+                    <div class="stat-value text-white">{{ number_format($ikm, 2) }}%</div>
                     <div class="stat-desc text-green-100 text-lg font-semibold">{{ $mutu }}</div>
                 </div>
                 <div class="stat bg-gradient-to-r from-purple-500 to-pink-600 text-white rounded-2xl shadow-xl card-hover">

@@ -25,11 +25,11 @@ class DatabaseSeeder extends Seeder
             'email' => 'test@gmail.com',
             'password' => bcrypt('123'),
         ]);
-        // Units::factory(10)->create()->each(function ($unit) {
-        //     Service::factory(5)->create([
-        //         'unit_id' => $unit->id,
-        //     ]);
-        // });
+        Units::factory(100)->create()->each(function ($unit) {
+            Service::factory(5)->create([
+                'unit_id' => $unit->id,
+            ]);
+        });
         Question::factory(9)->create()->each(function ($question) {
             $options = [
                 ['label' => 'Sangat Baik', 'bobot' => 4],
@@ -46,16 +46,16 @@ class DatabaseSeeder extends Seeder
                 ]);
             }
         });
-        // SurveyResponse::factory(1000)->create()->each(function ($response) {
-        //     // Jawab 10 pertanyaan
-        //     $questions = Question::all();
-        //     foreach ($questions as $question) {
-        //         $option = $question->questionOptions()->inRandomOrder()->first();
-        //         $response->responseAnswers()->create([
-        //             'question_id' => $question->id,
-        //             'question_option_id' => $option->id,
-        //         ]);
-        //     }
-        // });
+        SurveyResponse::factory(5000)->create()->each(function ($response) {
+            // Jawab 10 pertanyaan
+            $questions = Question::all();
+            foreach ($questions as $question) {
+                $option = $question->questionOptions()->inRandomOrder()->first();
+                $response->responseAnswers()->create([
+                    'question_id' => $question->id,
+                    'question_option_id' => $option->id,
+                ]);
+            }
+        });
     }
 }

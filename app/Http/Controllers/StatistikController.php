@@ -12,17 +12,19 @@ use Illuminate\Support\Carbon;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\SurveyResponseExport;
 
+set_time_limit(300); // 5 menit (300 detik)
+ini_set('memory_limit', '1G');
 class StatistikController extends Controller
 {
+
     public function index(Request $request)
     {
         $units = Units::all();
         $services = Service::all();
         $unitId = $request->input('unit_id');
         $serviceId = $request->input('service_id');
-        $tahun = now()->year;
-        $startDate = Carbon::parse($request->input('tanggal_awal') ?? "$tahun-01-01")->startOfDay();
-        $endDate = Carbon::parse($request->input('tanggal_akhir') ?? "$tahun-12-31")->endOfDay();
+        $startDate = Carbon::parse($request->input('tanggal_awal') ?? now()->startOfMonth())->startOfDay();
+        $endDate = Carbon::parse($request->input('tanggal_akhir') ?? now()->endOfMonth())->endOfDay();
 
         $query = SurveyResponse::query();
 
@@ -193,11 +195,8 @@ class StatistikController extends Controller
     }
     public function home()
     {
-        $query = SurveyResponse::query();
-        $units = Units::all();
-        $responses = $query;
-        $totalResponden = $responses->count();
-        $totalUnits = $units->count();
+        $totalResponden = SurveyResponse::count();
+        $totalUnits = Units::count();
 
         return view('welcome', compact('totalResponden', 'totalUnits'));
     }

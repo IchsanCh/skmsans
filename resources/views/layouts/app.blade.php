@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Survey SKM')</title>
+    <title>@yield('title', 'SurveyLo')</title>
+    <meta property="og:title" content="@yield('title', 'SurveyLo')">
     <meta name="description" content="@yield('meta_description', 'Survey SKM adalah aplikasi untuk mengelola survey kepuasan pelayanan publik')">
     <meta property="og:description" content="@yield('og_description', 'Ayo ikut berpartisipasi dalam Survei Kepuasan Masyarakat!')">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -19,6 +20,7 @@
 </head>
 
 <body>
+    <x-navbar></x-navbar>
     <main>
         @yield('content')
     </main>

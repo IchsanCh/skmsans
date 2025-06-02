@@ -1,7 +1,5 @@
 @extends('layouts.app')
-
-<x-navbar></x-navbar>
-@section('title', 'SKM MPP Kab Pekalongan')
+@section('title', 'SurveyLo')
 
 @section('meta_description',
     'Selamat datang di aplikasi Survei Kepuasan Masyarakat (SKM). Mari berpartisipasi untuk
@@ -55,7 +53,7 @@
                             Welcome To
                             <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary"
                                 data-aos="fade-up" data-aos-duration="800">
-                                SKM MPP Kab Pekalongan
+                                SurveyLo
                             </span>
                         </h1>
 

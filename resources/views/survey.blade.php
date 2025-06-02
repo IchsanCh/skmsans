@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Isi Survei Kepuasan Masyarakat')
+@section('title', 'Isi Survey')
 
 @section('meta_description',
     'Isi survei kepuasan masyarakat secara mudah dan cepat. Pendapat Anda sangat penting untuk

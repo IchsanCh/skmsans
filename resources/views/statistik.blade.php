@@ -1,6 +1,6 @@
 @extends('layouts.app')
 {{-- @extends('components.navbar') --}}
-@section('title', 'Statistik Hasil Survei SKM')
+@section('title', 'Statistik')
 
 @section('meta_description',
     'Lihat hasil dan analisis dari survei kepuasan masyarakat. Data real-time untuk evaluasi
@@ -9,7 +9,6 @@
 @section('og_description',
     'Lihat statistik kepuasan masyarakat secara langsung. Transparan, informatif, dan berbasis
     data.')
-    @extends('components.navbar')
     @push('styles')
         <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">

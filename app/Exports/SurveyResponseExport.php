@@ -8,6 +8,9 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Carbon\Carbon;
 
+set_time_limit(600);
+ini_set('memory_limit', '2G');
+
 class SurveyResponseExport implements FromCollection, WithHeadings
 {
     protected $request;
@@ -19,9 +22,10 @@ class SurveyResponseExport implements FromCollection, WithHeadings
 
     public function collection()
     {
+
         // Gunakan tahun berjalan sebagai default jika filter tidak diisi
-        $fromDate = $this->request->from_date ?? Carbon::now()->startOfYear()->format('Y-m-d');
-        $toDate = $this->request->to_date ?? Carbon::now()->endOfYear()->format('Y-m-d');
+        $fromDate = $this->request->from_date ?? Carbon::now()->startOfMonth()->format('Y-m-d');
+        $toDate = $this->request->to_date ?? Carbon::now()->endOfMonth()->format('Y-m-d');
 
         $query = SurveyResponse::query()->with(['unit', 'service', 'responseAnswers.questionOption']);
 

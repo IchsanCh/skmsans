@@ -17,9 +17,8 @@
                 </label>
 
                 <!-- Logo -->
-                <h1 class="text-xl font-bold ml-2 lg:ml-0">E-SKM 1.0</h1>
+                <h1 class="text-xl font-bold ml-2 lg:ml-0">SURVEYLO</h1>
             </div>
-
             <!-- Desktop Navigation -->
             <div class="navbar-end hidden lg:flex">
                 <ul class="menu menu-horizontal px-1 space-x-2">
@@ -31,7 +30,7 @@
                     </li>
                     <li>
                         <a href="{{ route('statistik.index') }}"
-                            class="rounded-xl font-semibold san4 {{ request()->routeIs('statistik.index') ? 'color3 font-bold border-b-2 border-white' : '' }}">
+                            class="rouded-xl font-semibold san4 {{ request()->routeIs('statistik.index') ? 'color3 font-bold border-b-2 border-white' : '' }}">
                             Statistik
                         </a>
                     </li>
@@ -46,7 +45,7 @@
         <aside class="min-h-full w-64 color1 text-white">
             <!-- Sidebar Header -->
             <div class="p-4 border-b border-base-300">
-                <h2 class="text-lg font-bold">E-SKM 1.0</h2>
+                <h2 class="text-lg font-bold">SURVEYLO</h2>
             </div>
 
             <!-- Sidebar Menu -->

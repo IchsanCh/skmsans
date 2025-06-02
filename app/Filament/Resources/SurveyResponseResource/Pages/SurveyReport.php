@@ -14,18 +14,47 @@ class SurveyReport extends Page
     protected static string $resource = SurveyResponseResource::class;
 
     protected static string $view = 'filament.resources.survey-response-resource.pages.survey-report';
+
     public $data;
     public $units;
     public $services;
+    public $totalRecords;
+    public $currentPage;
+    public $perPage = 50; // Jumlah data per halaman
 
     public function mount(): void
     {
-        $currentYear = now()->year;
+        set_time_limit(300); // 5 menit (300 detik)
+        ini_set('memory_limit', '1g');
 
-        $fromDate = request('from_date') ?? now()->setDate($currentYear, 1, 1)->toDateString();
-        $toDate = request('to_date') ?? now()->setDate($currentYear, 12, 31)->toDateString();
+        $this->units = Units::all();
+        $this->services = Service::all();
+        $this->currentPage = request('page', 1);
 
-        $query = SurveyResponse::query()
+        $this->loadData();
+    }
+
+    private function loadData()
+    {
+        $fromDate = request('from_date') ?? now()->startOfMonth()->toDateString();
+        $toDate = request('to_date') ?? now()->endOfMonth()->toDateString();
+
+        $query = $this->buildBaseQuery($fromDate, $toDate);
+
+        // Hitung total records
+        $this->totalRecords = $query->count();
+
+        // Load data dengan paginasi
+        $this->data = $query
+            ->with(['responseAnswers.questionOption'])
+            ->skip(($this->currentPage - 1) * $this->perPage)
+            ->take($this->perPage)
+            ->get();
+    }
+
+    private function buildBaseQuery($fromDate, $toDate)
+    {
+        return SurveyResponse::query()
             ->with(['unit', 'service'])
             ->when($fromDate, fn($q) =>
             $q->whereDate('created_at', '>=', $fromDate))
@@ -38,16 +67,89 @@ class SurveyReport extends Page
             ->when(request('jenis_kelamin'), fn($q) =>
             $q->where('jenis_kelamin', request('jenis_kelamin')))
             ->when(request('usia'), function ($q) {
-                [$min, $max] = explode('-', request('usia') . '-');
-                if (is_numeric($min) && is_numeric($max)) {
-                    $q->whereBetween('usia', [(int) $min, (int) $max]);
+                $usia = request('usia');
+                if (strpos($usia, '-') !== false) {
+                    [$min, $max] = explode('-', $usia);
+                    if (is_numeric($min) && is_numeric($max)) {
+                        $q->whereBetween('usia', [(int) $min, (int) $max]);
+                    }
                 } else {
-                    $q->where('usia', 'like', '%' . request('usia') . '%');
+                    $q->where('usia', 'like', '%' . $usia . '%');
                 }
-            });
+            })
+            ->orderBy('created_at', 'desc');
+    }
 
-        $this->data = $query->get();
-        $this->units = Units::all();
-        $this->services = Service::all();
+    // Method untuk export yang mengambil semua data
+    public function getAllDataForExport()
+    {
+        $fromDate = request('from_date') ?? now()->startOfMonth()->toDateString();
+        $toDate = request('to_date') ?? now()->endOfMonth()->toDateString();
+
+        return $this->buildBaseQuery($fromDate, $toDate)
+            ->with(['responseAnswers.questionOption', 'unit', 'service'])
+            ->get();
+    }
+
+    // Helper methods untuk pagination
+    public function getTotalPages()
+    {
+        return ceil($this->totalRecords / $this->perPage);
+    }
+
+    public function hasNextPage()
+    {
+        return $this->currentPage < $this->getTotalPages();
+    }
+
+    public function hasPreviousPage()
+    {
+        return $this->currentPage > 1;
+    }
+
+    public function getNextPageUrl()
+    {
+        if (!$this->hasNextPage()) return null;
+
+        $params = request()->query();
+        $params['page'] = $this->currentPage + 1;
+        return request()->url() . '?' . http_build_query($params);
+    }
+
+    public function getPreviousPageUrl()
+    {
+        if (!$this->hasPreviousPage()) return null;
+
+        $params = request()->query();
+        $params['page'] = $this->currentPage - 1;
+        return request()->url() . '?' . http_build_query($params);
+    }
+
+    public function getPageUrl($page)
+    {
+        $params = request()->query();
+        $params['page'] = $page;
+        return request()->url() . '?' . http_build_query($params);
+    }
+
+    // Method untuk mendapatkan range halaman yang ditampilkan
+    public function getPageRange()
+    {
+        $totalPages = $this->getTotalPages();
+        $currentPage = $this->currentPage;
+
+        $start = max(1, $currentPage - 2);
+        $end = min($totalPages, $currentPage + 2);
+
+        // Pastikan selalu menampilkan 5 halaman jika memungkinkan
+        if ($end - $start < 4) {
+            if ($start == 1) {
+                $end = min($totalPages, $start + 4);
+            } else {
+                $start = max(1, $end - 4);
+            }
+        }
+
+        return range($start, $end);
     }
 }
